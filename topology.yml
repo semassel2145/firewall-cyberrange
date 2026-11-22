@@ -1,4 +1,4 @@
-```yaml
+
 name: firewall-vpn-evasion
 
 hosts:
@@ -71,4 +71,4 @@ router_mappings:
     ip: 192.168.40.1
 
 groups: []
-```
+
