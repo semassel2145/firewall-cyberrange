@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET_IP={{ lab_target_ip | quote }}
+VPN_SERVER_IP={{ vpn_server_ip | quote }}
+
+# The target is an independent machine and protects itself: connections to
+# its services are accepted only from the VPN server address, i.e. when the
+# VPN server has source-NATed the tunnel traffic (MASQUERADE).
+iptables -N LAB_TARGET 2>/dev/null || true
+iptables -F LAB_TARGET
+iptables -A LAB_TARGET -s "${VPN_SERVER_IP}/32" -j ACCEPT
+iptables -A LAB_TARGET -j REJECT
+
+if ! iptables -C INPUT -d "${TARGET_IP}/32" -j LAB_TARGET 2>/dev/null; then
+    iptables -I INPUT 1 -d "${TARGET_IP}/32" -j LAB_TARGET
+fi

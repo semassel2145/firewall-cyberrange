@@ -1,0 +1,21 @@
+---
+- name: Install router tools
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    name:
+      - iptables
+      - iproute2
+    state: present
+
+- name: Enable IPv4 forwarding persistently
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-lab-forward.conf
+    content: "net.ipv4.ip_forward = 1\n"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable IPv4 forwarding now
+  ansible.builtin.command: sysctl -w net.ipv4.ip_forward=1
+  changed_when: false

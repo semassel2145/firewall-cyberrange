@@ -1,0 +1,71 @@
+---
+- name: Verify that this sandbox received its own randomized flags
+  hosts: "hosts,routers"
+  gather_facts: false
+  tasks:
+    - name: Require four distinct six-character APG flags
+      ansible.builtin.assert:
+        that:
+          - flag_firewall is defined and flag_web is defined and flag_tcp is defined and flag_pcap is defined
+          - '[flag_firewall, flag_web, flag_tcp, flag_pcap] | map("string") | map("length") | unique == [6]'
+          - '[flag_firewall, flag_web, flag_tcp, flag_pcap] | unique | length == 4'
+          - '[flag_firewall, flag_web, flag_tcp, flag_pcap] | join("") is match("^[A-Za-z0-9]{24}$")'
+        fail_msg: "APG flags are missing, not 6 alphanumeric characters, or not distinct. Check variables.yml and the sandbox's APG variable generation."
+        quiet: true
+      run_once: true
+
+- name: Install common lab utilities
+  hosts: "hosts,routers"
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Refresh package metadata and install base tools
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+        name:
+          - iproute2
+          - iptables
+          - python3
+        state: present
+
+    - name: Ensure the TUN kernel module is loaded
+      ansible.builtin.command: modprobe tun
+      changed_when: false
+      failed_when: false
+
+- name: Configure the student-accessible VPN server
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - role: user-access
+      user_access_username: seed
+      user_access_password: dees
+      user_access_sudo: true
+    - server
+
+- name: Configure the independent target machine
+  hosts: target
+  become: true
+  gather_facts: true
+  roles:
+    - target
+
+- name: Configure the router (forwarding only)
+  hosts: router
+  become: true
+  gather_facts: true
+  roles:
+    - router
+
+- name: Configure the student workstation
+  hosts: client
+  become: true
+  gather_facts: true
+  roles:
+    - role: user-access
+      user_access_username: seed
+      user_access_password: dees
+      user_access_sudo: true
+    - client
