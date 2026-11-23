@@ -1,6 +1,6 @@
 # Firewall Evasion Lab - CyberRangeCZ Platform
 
-A CyberRangeCZ sandbox and linear training definition that adapts the SEED **Firewall-VPN Lab** to a three-node routed sandbox. It uses the SEED-provided `vpnclient.c` and `vpnserver.c` sample programs (unencrypted UDP/TUN), with CyberRangeCZ provisioning, isolated target services, per-sandbox flags, and student exercises.
+A CyberRangeCZ sandbox and linear training definition that adapts the SEED **Firewall-VPN Lab** to a four-node routed sandbox. It uses the SEED-provided `vpnclient.c` and `vpnserver.c` sample programs (unencrypted UDP/TUN), with CyberRangeCZ provisioning, an independent target machine, per-sandbox flags, and student exercises.
 
 The lab is based on the learning objectives of the SEED Labs *Firewall Evasion Lab: Bypassing Firewalls using VPN*. It does **not** replace the SEED VPN implementation with a custom tunnel. The two programs in `seed-source/` preserve the SEED sample interface: `sudo ./vpnserver` and `sudo ./vpnclient <server-ip>`. The official SEED download is linked on the [Firewall-VPN Lab page](https://seedsecuritylabs.org/Labs_16.04/Networking/Firewall_VPN/).
 
@@ -10,7 +10,7 @@ The lab is based on the learning objectives of the SEED Labs *Firewall Evasion L
 
 ```text
 .
-├── topology.yml                # CyberRangeCZ topology (3 nodes, 2 networks)
+├── topology.yml                # CyberRangeCZ topology (4 nodes, 3 networks)
 ├── variables.yml               # Four per-sandbox six-character APG flags
 ├── training.json               # Importable CyberRangeCZ linear training definition
 ├── seed-source/
@@ -40,39 +40,41 @@ The lab is based on the learning objectives of the SEED Labs *Firewall Evasion L
 
 ## Network design
 
-Each sandbox contains three small nodes and two isolated networks:
+Each sandbox contains four nodes (`client`, `server`, `target`, `router`) and three isolated networks, plus the platform WAN:
 
 ```text
-                         CyberRangeCZ sandbox (one student)
+                    CyberRangeCZ sandbox (one student)
 
-   Student access                                                    Protected side
-   client-switch                                                     server-switch
-   192.168.30.0/24                                                   192.168.20.0/24
+   client-switch 1.2.30.0/24                 server-switch 1.2.20.0/24
+   (user-accessible)                         (user-accessible)
 
-   +-----------------------+          +---------------------------+
-   | client                |          | server                    |
-   | 192.168.30.5          |          | 192.168.20.5              |
-   | student shell         |          | VPN server UDP/55555      |
-   | egress deny rule      |          | SEED server creates tun0; student configures 192.168.53.1/24 |
-   +-----------+-----------+          +-------------+-------------+
-               |                                    |
-               |         +--------------------------+ 
-               +---------| router                   |
-                         | 192.168.30.1 / 192.168.20.1 / 192.168.40.1
-                         | pure router: forwarding only
-                         +------------+-------------+
-                                      |
-                         +------------+-------------+
-                         | target (own VM)          |
-                         | 192.168.40.10            |
-                         | HTTP :8080 + TCP :2323   |
-                         +--------------------------+
+   +---------------------------+             +-------------------------------+
+   | client                    |             | server                        |
+   | 1.2.30.5                  |             | 1.2.20.5                      |
+   | student shell             |             | VPN server UDP/55555          |
+   | egress deny rule          |             | student configures tun0       |
+   |                           |             | (1.2.53.1/24), forwarding, NAT|
+   +-------------+-------------+             +---------------+---------------+
+                 | 1.2.30.1                                  | 1.2.20.1
+                 |          +-----------------------+        |
+                 +----------| router                |--------+
+                            | forwarding only       |
+                            +-----------+-----------+
+                                        | 1.2.40.1
+                          target-switch 1.2.40.0/24 (not user-accessible)
+                                        |
+                            +-----------+-----------+
+                            | target (own VM)       |
+                            | 1.2.40.10             |
+                            | HTTP :8080 + TCP :2323|
+                            | accepts only 1.2.20.5 |
+                            +-----------------------+
 
-   VPN client TUN: 192.168.53.5/24
-   Target site:    http://192.168.40.10:8080
+   VPN client TUN: 1.2.53.5/24
+   Target site:    http://1.2.40.10:8080
 ```
 
-The target services run on their own VM (`target`, `192.168.40.10`) behind the router. The target itself only accepts connections when they are sourced from the VPN server (`192.168.20.5`). The client also has an egress OUTPUT rule that rejects direct packets to the target when they leave its physical interface. After students configure the server TUN, IP forwarding, firewall rules, and MASQUERADE, the VPN server forwards packets arriving on `tun0` toward the target.
+The target services run on their own VM (`target`, `1.2.40.10`) behind the router. The target itself only accepts connections when they are sourced from the VPN server (`1.2.20.5`). The client also has an egress OUTPUT rule that rejects direct packets to the target when they leave its physical interface. After students configure the server TUN, IP forwarding, firewall rules, and MASQUERADE, the VPN server forwards packets arriving on `tun0` toward the target.
 
 This deliberately uses a fixed lab target and a separate, permitted VPN endpoint. It avoids relying on public websites, DNS answers, or Internet routing during the student exercise. CyberRangeCZ's routed network topology replaces the VirtualBox NAT Network from the source handout, so the original VirtualBox-specific ARP return-path workaround is not needed; the VPN server still performs MASQUERADE so the target returns packets to the server.
 
@@ -87,7 +89,7 @@ See [`docs/architecture.md`](docs/architecture.md) for the packet flow and assum
 - Install the client egress rule and embed the sandbox-specific firewall audit token in its comment.
 - Install and compile the VPN server binary on the server; students start `vpnserver`, configure its automatically-created `tun0`, enable forwarding, and add NAT/forwarding rules themselves.
 - Install the required IP forwarding and firewall tools on the server; students enable IPv4 forwarding and create target-host-scoped forwarding/MASQUERADE rules as part of the exercise.
-- Start the target services on the independent `target` VM (`192.168.40.10:8080`) and restrict it to traffic source-NATed by the VPN server.
+- Start the target services on the independent `target` VM (`1.2.40.10:8080`) and restrict it to traffic source-NATed by the VPN server.
 - Generate and place three APG flags in target-service responses (HTTP body, HTTP header, and TCP banner) and one in the client firewall rule comment.
 
 **Students complete:**
@@ -110,7 +112,7 @@ The lab uses the SEED sample C programs rather than a locally rewritten tunnel. 
 
 ```bash
 sudo ./vpnserver
-sudo ./vpnclient 192.168.20.5
+sudo ./vpnclient 1.2.20.5
 ```
 
 The programs create `tun0` themselves. Start each program first, then assign its TUN address from a second terminal; do **not** pre-create `tun0` with `ip tuntap add`.
