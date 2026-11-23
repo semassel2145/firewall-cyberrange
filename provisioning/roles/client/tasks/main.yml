@@ -72,22 +72,22 @@
     content: |
       Firewall-VPN Lab - SEED VPN client
       ===================================
-      Target services: 192.168.40.10 TCP/8080 and TCP/2323
-      VPN server: 192.168.20.5 UDP/55555
-      TUN addresses: server 192.168.53.1/24, client 192.168.53.5/24
+      Target services: 1.2.40.10 TCP/8080 and TCP/2323
+      VPN server: 1.2.20.5 UDP/55555
+      TUN addresses: server 1.2.53.1/24, client 1.2.53.5/24
 
       The SEED vpnclient.c creates tun0 when it starts. After the VPN server
       is running, in terminal 1 execute:
-        sudo /usr/local/bin/vpnclient 192.168.20.5
+        sudo /usr/local/bin/vpnclient 1.2.20.5
 
       In terminal 2 configure the created interface:
-        sudo ip addr add 192.168.53.5/24 dev tun0
+        sudo ip addr add 1.2.53.5/24 dev tun0
         sudo ip link set tun0 up
 
       After the tunnel is running, add only the target host route:
-        sudo ip route replace 192.168.40.10/32 dev tun0
-        curl http://192.168.40.10:8080/flag
-        nc -nv 192.168.40.10 2323
+        sudo ip route replace 1.2.40.10/32 dev tun0
+        curl http://1.2.40.10:8080/flag
+        nc -nv 1.2.40.10 2323
 
       Do not delete the egress firewall rule or change the default route.
       Do not create tun0 manually before starting vpnclient. The tunnel is
