@@ -1,13 +1,13 @@
 ---
-lab_target_ip: 192.168.40.10
+lab_target_ip: 1.2.40.10
 lab_target_port: 8080
 lab_tcp_port: 2323
-vpn_server_ip: 192.168.20.5
+vpn_server_ip: 1.2.20.5
 vpn_server_port: 55555
-vpn_client_ip: 192.168.30.5
-vpn_client_cidr: 192.168.30.0/24
-vpn_tunnel_server_ip: 192.168.53.1
-vpn_tunnel_client_ip: 192.168.53.5
-vpn_tunnel_cidr: 192.168.53.0/24
-lab_target_gateway: 192.168.40.1
-vpn_server_net: 192.168.20.0/24
+vpn_client_ip: 1.2.30.5
+vpn_client_cidr: 1.2.30.0/24
+vpn_tunnel_server_ip: 1.2.53.1
+vpn_tunnel_client_ip: 1.2.53.5
+vpn_tunnel_cidr: 1.2.53.0/24
+lab_target_gateway: 1.2.40.1
+vpn_server_net: 1.2.20.0/24
