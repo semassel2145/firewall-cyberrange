@@ -43,21 +43,21 @@
       user_access_username: seed
       user_access_password: dees
       user_access_sudo: true
-    - server
+    - role: server
 
 - name: Configure the independent target machine
   hosts: target
   become: true
   gather_facts: true
   roles:
-    - target
+    - role: target
 
 - name: Configure the router (forwarding only)
   hosts: router
   become: true
   gather_facts: true
   roles:
-    - router
+    - role: router
 
 - name: Configure the student workstation
   hosts: client
@@ -68,4 +68,4 @@
       user_access_username: seed
       user_access_password: dees
       user_access_sudo: true
-    - client
+    - role: client
