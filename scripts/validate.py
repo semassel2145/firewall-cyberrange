@@ -25,8 +25,13 @@ def main() -> int:
         if networks.get(name,{}).get("accessible_by_user") is not True: errors.append(f"topology.yml: {name} must be user-accessible")
     if networks.get("target-switch",{}).get("accessible_by_user") is not False: errors.append("topology.yml: target-switch must not be user-accessible")
     maps={(m["host"],m["ip"]) for m in topology.get("net_mappings",[])}
-    if ("target","192.168.40.10") not in maps: errors.append("topology.yml: target must be mapped to 192.168.40.10")
-    if load_yaml(ROOT/"provisioning/group_vars/all.yml").get("lab_target_ip")!="192.168.40.10": errors.append("group_vars: lab_target_ip must be 192.168.40.10 (independent target VM)")
+    target_ips={ip for host,ip in maps if host=="target"}
+    gv=load_yaml(ROOT/"provisioning/group_vars/all.yml")
+    if len(target_ips)!=1: errors.append("topology.yml: target must have exactly one net_mapping")
+    elif gv.get("lab_target_ip") not in target_ips: errors.append(f"group_vars: lab_target_ip ({gv.get('lab_target_ip')}) must equal the target's topology.yml address ({sorted(target_ips)[0]})")
+    for host,var in (("server","vpn_server_ip"),("client","vpn_client_ip")):
+        ips={ip for h,ip in maps if h==host}
+        if ips and gv.get(var) not in ips: errors.append(f"group_vars: {var} ({gv.get(var)}) must equal the {host}'s topology.yml address ({sorted(ips)[0]})")
     required={"flag_firewall","flag_web","flag_tcp","flag_pcap"}
     if set(apg)!=required: errors.append(f"variables.yml: expected {sorted(required)}, got {sorted(apg)}")
     for name,value in apg.items():
