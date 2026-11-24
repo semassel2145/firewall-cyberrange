@@ -47,16 +47,10 @@
       "solution_penalized": true,
       "hints": [
         {
-          "title": "Inspect active rules",
-          "content": "`iptables-save` prints the active rules in a restorable format. Search its output for the target IP or the comment prefix `CRCZ-FW-AUDIT`.",
+          "title": "Inspect the firewall",
+          "content": "Use `iptables-save` to inspect active IPv4 rules. Look for the target IP or the `CRCZ-FW-AUDIT` comment.",
           "hint_penalty": 10,
           "order": 0
-        },
-        {
-          "title": "Do not disable the filter",
-          "content": "The target rule matches the physical egress interface. Your objective is to route the blocked destination through the tunnel, not to delete the rule.",
-          "hint_penalty": 20,
-          "order": 1
         }
       ],
       "incorrect_answer_limit": 10,
@@ -85,22 +79,10 @@
       "solution_penalized": true,
       "hints": [
         {
-          "title": "Configure the server first",
-          "content": "Start `sudo /usr/local/sbin/vpnserver` first. It creates `tun0`; configure `1.2.53.1/24` from a second terminal and enable `net.ipv4.ip_forward`.",
-          "hint_penalty": 10,
+          "title": "Follow the tunnel setup",
+          "content": "Start the VPN server before the client. Configure the automatically created `tun0` interfaces, enable forwarding and configure target-scoped NAT on the server. Add only a host route on the client.",
+          "hint_penalty": 15,
           "order": 0
-        },
-        {
-          "title": "Do not forget source NAT",
-          "content": "The target only accepts packets sourced from `1.2.20.5`. Use MASQUERADE for packets from `1.2.53.0/24` to `1.2.40.10/32` on the server-side interface.",
-          "hint_penalty": 20,
-          "order": 1
-        },
-        {
-          "title": "Use a host route on the client",
-          "content": "Start `sudo /usr/local/bin/vpnclient 1.2.20.5`, then configure the automatically-created `tun0`. Add only `1.2.40.10/32` through `tun0`; leave the default route alone.",
-          "hint_penalty": 30,
-          "order": 2
         }
       ],
       "incorrect_answer_limit": 10,
@@ -132,16 +114,10 @@
       "solution_penalized": true,
       "hints": [
         {
-          "title": "Use netcat",
-          "content": "`nc -nv <host> <port>` opens a raw TCP connection and prints the service banner.",
+          "title": "Test another protocol",
+          "content": "Use Netcat (`nc`) to connect to TCP port `2323`. The existing `/32` route should handle this traffic.",
           "hint_penalty": 10,
           "order": 0
-        },
-        {
-          "title": "No new route is needed",
-          "content": "Routing is performed by destination IP. The same `/32` route for `1.2.40.10` should carry both HTTP and this TCP service.",
-          "hint_penalty": 20,
-          "order": 1
         }
       ],
       "incorrect_answer_limit": 10,
@@ -169,16 +145,10 @@
       "solution_penalized": true,
       "hints": [
         {
-          "title": "Capture the inner traffic",
-          "content": "The inner TCP packets appear on `tun0`. Use `tcpdump -w` to save them to a pcap file while you make the HTTP request.",
+          "title": "Inspect the tunnel traffic",
+          "content": "Capture packets on `tun0` while requesting the capture endpoint. Inspect the HTTP response headers in the saved capture.",
           "hint_penalty": 10,
           "order": 0
-        },
-        {
-          "title": "Inspect HTTP headers",
-          "content": "The challenge token is in the response header `X-CRCZ-Lab-Flag`. Use `tcpdump -A -r` to print the captured HTTP data.",
-          "hint_penalty": 20,
-          "order": 1
         }
       ],
       "incorrect_answer_limit": 10,
