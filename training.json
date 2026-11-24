@@ -1,3 +1,4 @@
+
 {
   "title": "Firewall Evasion Lab - TUN-over-UDP VPN",
   "description": "A CyberRangeCZ implementation of the SEED firewall-evasion learning objectives. Students inspect an egress filter, establish a TUN-over-UDP tunnel, route the blocked destination through it, and verify the packet path.",
@@ -60,7 +61,7 @@
       ],
       "incorrect_answer_limit": 10,
       "attachments": [],
-      "max_score": 50,
+      "max_score": 7,
       "variant_answers": true,
       "reference_solution": [],
       "mitre_techniques": [],
@@ -104,7 +105,7 @@
       ],
       "incorrect_answer_limit": 10,
       "attachments": [],
-      "max_score": 150,
+      "max_score": 22,
       "variant_answers": true,
       "reference_solution": [],
       "mitre_techniques": [],
@@ -145,7 +146,7 @@
       ],
       "incorrect_answer_limit": 10,
       "attachments": [],
-      "max_score": 75,
+      "max_score": 11,
       "variant_answers": true,
       "reference_solution": [],
       "mitre_techniques": [],
@@ -182,7 +183,7 @@
       ],
       "incorrect_answer_limit": 10,
       "attachments": [],
-      "max_score": 100,
+      "max_score": 15,
       "variant_answers": true,
       "reference_solution": [],
       "mitre_techniques": [],
@@ -198,12 +199,11 @@
       "level_type": "ASSESSMENT_LEVEL",
       "order": 6,
       "estimated_duration": 5,
-      "minimal_possible_solve_time": null,
       "questions": [
         {
           "question_type": "MCQ",
           "text": "Why is source NAT (MASQUERADE) applied on the VPN server?",
-          "points": 100,
+          "points": 15,
           "penalty": 0,
           "order": 0,
           "answer_required": true,
@@ -228,7 +228,7 @@
         {
           "question_type": "MCQ",
           "text": "Does the teaching VPN encrypt the inner IP packet?",
-          "points": 100,
+          "points": 15,
           "penalty": 0,
           "order": 1,
           "answer_required": true,
@@ -248,7 +248,7 @@
         {
           "question_type": "MCQ",
           "text": "What should happen to the client default route in this exercise?",
-          "points": 100,
+          "points": 15,
           "penalty": 0,
           "order": 2,
           "answer_required": true,
