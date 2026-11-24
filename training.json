@@ -49,7 +49,7 @@
         {
           "title": "Inspect the firewall",
           "content": "Use `iptables-save` to inspect active IPv4 rules. Look for the target IP or the `CRCZ-FW-AUDIT` comment.",
-          "hint_penalty": 10,
+          "hint_penalty": 2,
           "order": 0
         }
       ],
@@ -81,7 +81,7 @@
         {
           "title": "Follow the tunnel setup",
           "content": "Start the VPN server before the client. Configure the automatically created `tun0` interfaces, enable forwarding and configure target-scoped NAT on the server. Add only a host route on the client.",
-          "hint_penalty": 15,
+          "hint_penalty": 5,
           "order": 0
         }
       ],
@@ -116,7 +116,7 @@
         {
           "title": "Test another protocol",
           "content": "Use Netcat (`nc`) to connect to TCP port `2323`. The existing `/32` route should handle this traffic.",
-          "hint_penalty": 10,
+          "hint_penalty": 3,
           "order": 0
         }
       ],
@@ -147,7 +147,7 @@
         {
           "title": "Inspect the tunnel traffic",
           "content": "Capture packets on `tun0` while requesting the capture endpoint. Inspect the HTTP response headers in the saved capture.",
-          "hint_penalty": 10,
+          "hint_penalty": 4,
           "order": 0
         }
       ],
